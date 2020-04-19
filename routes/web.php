@@ -16,6 +16,10 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+
+Auth::routes();
+
+Route::get('/home', 'HomeController@index')->name('home');
 //namespace где искать контроллеры, у нас в пабке Blog
 //prefix, /blog/posts, добавляет префикс /blog/ в начало
 //resourse REST, благодаря одной записи 7 маршрутов
@@ -26,6 +30,15 @@ Route::group(['namespace' => 'Blog', 'prefix' => 'blog'], function(){
 
 Route::resource('rest', 'RestTestController')->names('restTest');
 
-Auth::routes();
-
-Route::get('/home', 'HomeController@index')->name('home');
+//Админка блога
+$groupData = [
+    'namespace' => 'Blog\Admin',
+    'prefix'    => 'admin/blog',
+];
+Route::group($groupData, function(){
+    //BlogCategory
+    $methods = ['index', 'edit', 'update', 'create', 'store',];
+    Route::resource('categories', 'CategoryController')
+        ->only($methods)
+        ->names('blog.admin.categories');
+});
