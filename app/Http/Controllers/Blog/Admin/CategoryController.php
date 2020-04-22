@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Blog\Admin;
 
+use App\Http\Requests\BlogCategoryUpdateRequest;
 use App\Models\BlogCategory;
 use Illuminate\Http\Request;
 
@@ -79,8 +80,23 @@ class CategoryController extends BaseController
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(BlogCategoryUpdateRequest $request, $id)
     {
+        /*
+        $rules = [
+            'title'         => 'required|min:5|max:200',
+            'slug'          => 'max:200',
+            'description'   => 'string|max:500|min:3',
+            'parent_id'     => 'required|integer|exists:blog_categories,id',
+            //в таблице blog_categories должно быть найдено поле id
+        ];
+        //validate автоматически редиректит назад with->errors
+        //порождаем сами валидатор, есть настройки полезные
+        //$validator = \Validator::make($request->all(), $rules);
+        BlogCategoryUpdateRequest сделает автоматически validate
+        $validatedData = $request->validate($rules);
+        $validatedData = $this->validate($request, $rules);
+        */
         $item = BlogCategory::find($id);
         if (empty($item))
         {
