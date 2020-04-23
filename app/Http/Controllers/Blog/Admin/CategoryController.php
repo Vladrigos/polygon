@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers\Blog\Admin;
 
+use App\Http\Requests\BlogCategoryCreateRequest;
 use App\Http\Requests\BlogCategoryUpdateRequest;
 use App\Models\BlogCategory;
-use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class CategoryController extends BaseController
 {
@@ -27,7 +28,11 @@ class CategoryController extends BaseController
      */
     public function create()
     {
-        //
+        $item = new BlogCategory();
+        $categoryList = BlogCategory::all();
+
+        return view('blog.admin.categories.edit',
+            compact('item', 'categoryList'));
     }
 
     /**
@@ -36,9 +41,34 @@ class CategoryController extends BaseController
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(BlogCategoryCreateRequest $request)
     {
-        //
+        //при нажатии сохранить с create попадаем в store
+        $data = $request->input();
+        if(empty($data['slug']))
+        {
+            $data['slug'] = str_slug($data['title']);
+        }
+
+        //Создаст обьект но НЕ добавит в бд
+        /*
+        $item = new BlogCategory($data);
+        $item->save();
+        */
+        //Создаст обьект и добавит в бд
+        $item = (new BlogCategory())->create($data);
+
+        if($item)
+        {
+            return redirect()->route('blog.admin.categories.edit', [$item->id])
+                ->with(['success' => 'Успешно сохранено!']);
+        }
+        else
+        {
+            return back()->withErrors(['msg' => 'Ошибка сохранения'])
+                ->withInput();
+        }
+
     }
 
     /**
@@ -78,7 +108,7 @@ class CategoryController extends BaseController
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function update(BlogCategoryUpdateRequest $request, $id)
     {
@@ -108,8 +138,15 @@ class CategoryController extends BaseController
         }
 
         $data = $request->all();
-        $result = $item->fill($data)->save();
 
+        if(empty($data['slug']))
+        {
+            $data['slug'] = Str::slug($data['title']);
+        }
+
+        //одно и то же
+        //$result = $item->fill($data)->save();
+        $result = $item->update($data);
         if($result)
         {
             return redirect()
