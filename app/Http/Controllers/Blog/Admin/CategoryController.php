@@ -5,10 +5,29 @@ namespace App\Http\Controllers\Blog\Admin;
 use App\Http\Requests\BlogCategoryCreateRequest;
 use App\Http\Requests\BlogCategoryUpdateRequest;
 use App\Models\BlogCategory;
+use App\Repositories\BlogCategoryRepository;
 use Illuminate\Support\Str;
+
+/**
+ * Управление категориями блога
+ *
+ * Class CategoryController
+ * @package App\Http\Controllers\Blog\Admin
+ */
 
 class CategoryController extends BaseController
 {
+    /**
+     * @var BlogCategoryRepository
+     */
+    private $blogCategoryRepository;
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->blogCategoryRepository = app(BlogCategoryRepository::class);
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -16,7 +35,8 @@ class CategoryController extends BaseController
      */
     public function index()
     {
-        $paginator = BlogCategory::paginate(5);
+        //$paginator = BlogCategory::paginate(5);
+        $paginator = $this->blogCategoryRepository->getAllWithPaginate(5);
 
         return view('blog.admin.categories.index', compact('paginator'));
     }
@@ -29,7 +49,8 @@ class CategoryController extends BaseController
     public function create()
     {
         $item = new BlogCategory();
-        $categoryList = BlogCategory::all();
+        $categoryList =
+            $this->blogCategoryRepository->getForComboBox();
 
         return view('blog.admin.categories.edit',
             compact('item', 'categoryList'));
@@ -88,8 +109,11 @@ class CategoryController extends BaseController
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
+    //ларавель сам создаст обьект класа BlogCategoryRepository
+    //если было бы ($id, BlogCategoryRepository $categoryRepository)
     public function edit($id)
     {
+        /*
         //в учебных целях, в нормальном проекте так не надо
         $item = BlogCategory::find($id);
         //аккуратнее с find or fail, ибо если где то вглубине кода оно будет, и вылезет ошибка,
@@ -97,7 +121,16 @@ class CategoryController extends BaseController
         $item = BlogCategory::findOrFail($id);
         //$item = BlogCategory::where('id', '=', $id)->first();
         //dd($item->pluck('id'));
-        $categoryList = BlogCategory::all();
+        */
+        //дай запись для edit по id
+        $item = $this->blogCategoryRepository->getEdit($id);
+        if(empty($item))
+        {
+            abort(404);
+        }
+        $categoryList =
+            $this->blogCategoryRepository->getForComboBox();
+
         return view('blog.admin.categories.edit',
             compact('item', 'categoryList'));
         //compact - передали параметры во view
@@ -127,7 +160,8 @@ class CategoryController extends BaseController
         $validatedData = $request->validate($rules);
         $validatedData = $this->validate($request, $rules);
         */
-        $item = BlogCategory::find($id);
+        //$item = BlogCategory::find($id);
+        $item = $this->blogCategoryRepository->getEdit($id);
         if (empty($item))
         {
             //back это helper ская функция, которая редиректит назад
