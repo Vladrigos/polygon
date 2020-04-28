@@ -2,7 +2,7 @@
 
 @section('content')
     @php
-        /** @var \App\Models\BlogCategory $item */
+        /** @var \App\ $item */
     @endphp
 
     @if($item->exists)

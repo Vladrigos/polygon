@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Blog\Admin;
 use App\Http\Requests\BlogPostUpdateRequest;
 use App\Repositories\BlogCategoryRepository;
 use App\Repositories\BlogPostRepository;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 /**
@@ -25,6 +24,7 @@ class PostController extends BaseController
      * @var BlogCategoryRepository
      */
     private $blogCategoryRepository;
+
     /**
      * Display a listing of the resource.
      *
@@ -58,7 +58,7 @@ class PostController extends BaseController
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
@@ -69,7 +69,7 @@ class PostController extends BaseController
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function show($id)
@@ -80,13 +80,13 @@ class PostController extends BaseController
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function edit($id)
     {
         $item = $this->blogPostRepository->getEdit($id);
-        if(empty($item))
+        if (empty($item))
         {
             abort(404);
         }
@@ -100,15 +100,16 @@ class PostController extends BaseController
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param \Illuminate\Http\Request $request
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function update(BlogPostUpdateRequest $request, $id)
     {
         $item = $this->blogPostRepository->getEdit($id);
 
-        if(empty($item)){
+        if (empty($item))
+        {
             return back()
                 ->withErrors(['msg' => "Запись id=[{$id}] не найдена"])
                 ->withInput();
@@ -116,6 +117,8 @@ class PostController extends BaseController
 
         $data = $request->all();
 
+        /*
+         * ушло в обсервер
         if(empty($data['slug']))
         {
             $data['slug'] = \Str::slug($data['title']);
@@ -124,16 +127,16 @@ class PostController extends BaseController
         {
             $data['published_at'] = Carbon::now();
         }
+        */
 
         $result = $item->update($data);
 
-        if($result)
+        if ($result)
         {
             return redirect()
                 ->route('blog.admin.posts.edit', $item->id)
                 ->with(['success' => 'Успешно сохранено']);
-        }
-        else
+        } else
         {
             return back()
                 ->withError(['msg' => 'Ошибка сохранения'])
@@ -144,7 +147,7 @@ class PostController extends BaseController
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function destroy($id)

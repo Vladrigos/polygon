@@ -1,5 +1,5 @@
 @php
-    /** @var \App\Models\BlogCategory $item */
+    /** @var \App\ $item */
     /** @var \Illuminate\Http\Response $categoryList */
 @endphp
 <div class="row justify-content-center">

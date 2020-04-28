@@ -6,7 +6,6 @@ use App\Http\Requests\BlogCategoryCreateRequest;
 use App\Http\Requests\BlogCategoryUpdateRequest;
 use App\Models\BlogCategory;
 use App\Repositories\BlogCategoryRepository;
-use Illuminate\Support\Str;
 
 /**
  * Управление категориями блога
@@ -66,11 +65,12 @@ class CategoryController extends BaseController
     {
         //при нажатии сохранить с create попадаем в store
         $data = $request->input();
+        /*ушло в обсервер
         if(empty($data['slug']))
         {
             $data['slug'] = str_slug($data['title']);
         }
-
+        */
         //Создаст обьект но НЕ добавит в бд
         /*
         $item = new BlogCategory($data);
@@ -139,7 +139,7 @@ class CategoryController extends BaseController
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  BlogCategoryUpdateRequest  $request
      * @param  int  $id
      * @return \Illuminate\Http\RedirectResponse
      */
@@ -172,12 +172,13 @@ class CategoryController extends BaseController
         }
 
         $data = $request->all();
-
+        /*
+         * //ушло в обсервер
         if(empty($data['slug']))
         {
             $data['slug'] = Str::slug($data['title']);
         }
-
+        */
         //одно и то же
         //$result = $item->fill($data)->save();
         $result = $item->update($data);
